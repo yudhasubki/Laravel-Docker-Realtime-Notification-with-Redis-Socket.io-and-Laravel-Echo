@@ -1,0 +1,43 @@
+version: '3'
+services:
+  #service will go
+  #want use docker-compose exec service your-command-goes-here
+  #our apps
+  app:
+    build:
+      context: ./
+      dockerfile: app.dockerfile
+    working_dir: /var/www #set working_dir on container
+    volumes:
+      - ./:/var/www
+    environment:
+      - "DB_PORT=3306"
+      - "DB_HOST=database"
+      - "REDIS_HOST=redis"
+      - "REDIS_PORT=6379"
+  #Web server Setup
+  web:
+    image: nginx:alpine
+    volumes:
+      - ./:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    ports:
+      - "8080:80"
+  #mysql server setup
+  database:
+    image: mysql:5.7.25
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=belajar_docker"
+      - "MYSQL_ROOT_PASSWORD=yudhaganteng"
+    ports:
+      - "3306:3306"
+  #redis
+  redis:
+    container_name: laradocker_redis
+    image: redis:5.0.3
+    ports:
+      - "6379:6379"
+volumes:
+  dbdata:
